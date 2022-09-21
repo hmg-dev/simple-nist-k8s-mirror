@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nist-mirror
+  name: nist-mirror-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nist-mirror
+      instance: nginx
+  template:
+    metadata:
+      labels:
+        app: nist-mirror
+        instance: nginx
+    spec:
+      containers:
+        - image: nginx:stable-alpine
+          imagePullPolicy: Always
+          name: nist-mirror-nginx-img
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 150m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/
+              name: volume-nginx
+            - mountPath: /etc/nginx/nginx.conf
+              name: volume-nginx-conf
+              subPath: nginx.conf
+            - mountPath: /var/www
+              name: volume-mirror-data
+      volumes:
+        - name: volume-nginx
+          configMap:
+            name: nist-mirror-cm
+            items:
+              - key: mirror.conf
+                path: mirror.conf
+        - name: volume-nginx-conf
+          configMap:
+            name: nist-mirror-cm
+        - name: volume-mirror-data
+          persistentVolumeClaim:
+            claimName: nist-mirror-cache-pvc

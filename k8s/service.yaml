@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nist-mirror
+  name: nist-mirror-service
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      name: nginxport
+  selector:
+    app: nist-mirror
+    instance: nginx
+  type: ClusterIP

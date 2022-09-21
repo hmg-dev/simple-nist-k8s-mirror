@@ -1,0 +1,30 @@
+pool:
+  vmImage: 'Ubuntu-22.04'
+
+trigger:
+  branches:
+    include:
+      - master
+
+variables:
+  imageName: 'nist-mirror-fetcher'
+
+steps:
+  - task: Docker@2
+    inputs:
+      containerRegistry: '_REPLACEME_'
+      repository: '$(imageName)'
+      command: 'build'
+      Dockerfile: '**/Dockerfile'
+      tags: |
+        $(Build.BuildNumber)
+        latest
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: '_REPLACEME_'
+      repository: '$(imageName)'
+      command: 'push'
+      tags: |
+        $(Build.BuildNumber)
+        latest

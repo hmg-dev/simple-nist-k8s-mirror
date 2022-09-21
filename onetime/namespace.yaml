@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nist-mirror
+spec:
+  finalizers:
+    - kubernetes
+status:
+  phase: Active

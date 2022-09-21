@@ -1,0 +1,25 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  labels:
+    app: nist-mirror
+  name: nist-mirror-fetcher-cronjob
+spec:
+  schedule: "15 6 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: nist-mirror-fetcher-img
+              image: _REPLACEME_/nist-mirror-fetcher:latest
+              imagePullPolicy: Always
+              volumeMounts:
+                - mountPath: /var/www
+                  name: volume-mirror-data
+          restartPolicy: Never
+          volumes:
+            - name: volume-mirror-data
+              persistentVolumeClaim:
+                claimName: nist-mirror-cache-pvc
