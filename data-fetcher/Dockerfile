@@ -1,12 +1,11 @@
-FROM ubuntu:22.04
+FROM amazoncorretto:17-alpine
 
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get install -y curl wget coreutils gzip
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+ARG RELEASE_VERSION="5.0.2"
 
-COPY fetch-files.sh /opt/fetch-files.sh
+RUN apk --no-cache add bash wget gzip
 
-VOLUME /var/www
+WORKDIR /app
+RUN wget --progress=dot:giga "https://github.com/jeremylong/Open-Vulnerability-Project/releases/download/v${RELEASE_VERSION}/vulnz-${RELEASE_VERSION}.jar" && \
+    mv "vulnz-${RELEASE_VERSION}.jar" "vulnz.jar"
 
-CMD [ "/opt/fetch-files.sh" ]
+COPY mirror.sh /app/mirror.sh

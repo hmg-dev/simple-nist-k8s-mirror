@@ -1,17 +1,16 @@
 # Simple Mirror/Cache for NISTs NVD
 
-There is another existing solution for a nist mirror in k8s: [https://github.com/stevespringett/nist-data-mirror](https://github.com/stevespringett/nist-data-mirror)<br/>
-But it has its drawbacks! 
-* Using the same Dockerimage for fetching the data and serving it. 
-* Running Cronjobs in the POD instead of using a k8s cronjob (and thus risking a race-condition).
-* Using Java for fetching and verifying the files seems a bit bloated.
+On 15.12.2023, the official NVD-Feed of NIST "retired" and only the API remains.
 
-<br/>
-So, here is a little more simple approach.
+In order to provide a mirror nevertheless, this project utilizes the vulnz-application of the [Open-Vulnerability-Project](https://github.com/jeremylong/Open-Vulnerability-Project/tree/main/vulnz), to fetch all the data from the API,
+and provide a feed similar to the old one.
 
-* Using nginx without a custom image and inject the config via k8s ConfigMap
-* Use a small bash-script to fetch and verify the files and put it in a tiny Dockerimage
-* Use k8s Cronjob to fetch the files on a regular basis
+## Client changes
+In order to use this feed, you need version 9 (or newer) of [DependencyCheck](https://github.com/jeremylong/DependencyCheck) - its not backwards-compatible to older versions.
+
+Also be aware of the changed settings. The new setting to utilize the feed is: `nvdDatafeedUrl`
+
+See http://jeremylong.github.io/DependencyCheck/dependency-check-maven/configuration.html for details.
 
 ## notes and tech details
 ### nginx config
@@ -26,3 +25,4 @@ don't forget to add labels afterwards!
 * You might want/need to change the `storageClassName` of the PVC
 * Don't forget to replace Host in `mirror.conf`, `configmap.yaml` and `ingress.yaml`
 * Don't forget to replace Dockerregistry in `azure-pipelines.yml` and `cronjob.yaml`
+* Optional: enter your NVD-API Key in the secret.yaml - if you have one.

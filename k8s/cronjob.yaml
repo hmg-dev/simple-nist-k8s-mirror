@@ -1,4 +1,4 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   labels:
@@ -14,7 +14,22 @@ spec:
           containers:
             - name: nist-mirror-fetcher-img
               image: _REPLACEME_/nist-mirror-fetcher:latest
+              command:
+                - /app/mirror.sh
               imagePullPolicy: Always
+              env:
+                - name: NVD_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: nist-mirror-fetcher-secret
+                      key: NVD_API_KEY
+              resources:
+                limits:
+                  cpu: 1
+                  memory: 3Gi
+                requests:
+                  cpu: 500m
+                  memory: 3Gi
               volumeMounts:
                 - mountPath: /var/www
                   name: volume-mirror-data
